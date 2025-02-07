@@ -93,8 +93,20 @@ namespace Oxide.Plugins
 
         private void Unload()
         {
-            UpdateCatapultReloadTimes(DEFAULT_CATAPULT_RELOAD_TIME);
-            UpdateBallistaReloadTimes(DEFAULT_BALLISTA_RELOAD_TIME);
+            foreach (BaseEntity entity in BaseNetworkable.serverEntities)
+            {
+                if (entity == null)
+                    continue;
+
+                if (entity is Catapult || entity is BallistaGun)
+                {
+                    float defaultReloadTime = DEFAULT_BALLISTA_RELOAD_TIME;
+                    if (entity is Catapult)
+                        defaultReloadTime = DEFAULT_CATAPULT_RELOAD_TIME;
+  
+                    SetReloadTime(entity, defaultReloadTime);
+                }
+            }
 
             _config = null;
             _plugin = null;
@@ -102,36 +114,47 @@ namespace Oxide.Plugins
 
         private void OnServerInitialized(bool isStartup)
         {
-            UpdateCatapultReloadTimes(_config.CatapultReloadDurationSeconds);
-            UpdateBallistaReloadTimes(_config.BallistaReloadDurationSeconds);
+            foreach (BaseEntity entity in BaseNetworkable.serverEntities)
+            {
+                if (entity == null)
+                    continue;
+
+                float newReloadTime = _config.BallistaReloadDurationSeconds;
+                if (entity is Catapult)
+                    newReloadTime = _config.CatapultReloadDurationSeconds;
+
+                SetReloadTime(entity, newReloadTime);
+            }
+        }
+
+        private void OnEntitySpawned(BaseEntity entity)
+        {
+            if (entity is Catapult)
+            {
+                SetReloadTime(entity, _config.CatapultReloadDurationSeconds);
+            }
+            else if (entity is BallistaGun)
+            {
+                SetReloadTime(entity, _config.BallistaReloadDurationSeconds);
+            }
         }
 
         #endregion Oxide Hooks
 
         #region Reload Time Tweaking
 
-        private void UpdateCatapultReloadTimes(float reloadTime)
+        private void SetReloadTime(BaseEntity entity, float reloadTime)
         {
-            foreach (Catapult catapult in BaseNetworkable.serverEntities.OfType<Catapult>())
+            if (entity is Catapult catapult)
             {
-                if (catapult == null)
-                    continue;
-
                 FieldInfo reloadField = typeof(Catapult).GetField("reloadTime", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (reloadField != null)
                 {
                     reloadField.SetValue(catapult, reloadTime);
                 }
             }
-        }
-
-        private void UpdateBallistaReloadTimes(float reloadTime)
-        {
-            foreach (BallistaGun ballista in BaseNetworkable.serverEntities.OfType<BallistaGun>())
+            else if (entity is BallistaGun ballista)
             {
-                if (ballista == null)
-                    continue;
-
                 FieldInfo reloadField = typeof(BallistaGun).GetField("reloadTime", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (reloadField != null)
                 {
