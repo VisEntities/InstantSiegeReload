@@ -5,13 +5,12 @@
  */
 
 using Newtonsoft.Json;
-using System.Linq;
 using System.Reflection;
 
 namespace Oxide.Plugins
 {
     [Info("Instant Siege Reload", "VisEntities", "1.0.0")]
-    [Description(" ")]
+    [Description("Lets you modify reload time for catapults and ballistas.")]
     public class InstantSiegeReload : RustPlugin
     {
         #region Fields
