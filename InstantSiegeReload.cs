@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Oxide.Plugins
 {
-    [Info("Instant Siege Reload", "VisEntities", "1.0.0")]
+    [Info("Instant Siege Reload", "VisEntities", "1.0.1")]
     [Description("Lets you modify reload time for catapults and ballistas.")]
     public class InstantSiegeReload : RustPlugin
     {
@@ -146,7 +146,7 @@ namespace Oxide.Plugins
         {
             if (entity is Catapult catapult)
             {
-                FieldInfo reloadField = typeof(Catapult).GetField("reloadTime", BindingFlags.Instance | BindingFlags.NonPublic);
+                FieldInfo reloadField = typeof(Catapult).GetField("reloadTime", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
                 if (reloadField != null)
                 {
                     reloadField.SetValue(catapult, reloadTime);
@@ -154,7 +154,7 @@ namespace Oxide.Plugins
             }
             else if (entity is BallistaGun ballista)
             {
-                FieldInfo reloadField = typeof(BallistaGun).GetField("reloadTime", BindingFlags.Instance | BindingFlags.NonPublic);
+                FieldInfo reloadField = typeof(BallistaGun).GetField("reloadTime", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
                 if (reloadField != null)
                 {
                     reloadField.SetValue(ballista, reloadTime);
